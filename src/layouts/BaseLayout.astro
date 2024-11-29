@@ -11,6 +11,11 @@ import Footer from "@/components/global/Footer.astro";
   <body class="mx-auto bg-black 2xl:max-w-7xl">
     <Navigation />
     <slot />
+    <div id="custom-cursor"></div>
+    <script type="module" 
+    src="/src/scripts/custom-cursor.js">
+  </script>
+  <script src="/js/parallax.js" defer></script>
     <Footer />
   </body>
 </html>

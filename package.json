@@ -18,11 +18,13 @@
     "@preline/collapse": "^2.5.0",
     "@preline/dropdown": "^2.5.0",
     "@preline/overlay": "^2.5.0",
+    "@studio-freight/lenis": "^1.0.42",
     "@types/clipboard": "^2.0.10",
     "astro": "^4.15.4",
     "astro-vtbot": "^1.10.7",
     "clipboard": "^2.0.11",
     "lenis": "^1.1.17",
+    "lottie-web": "^5.12.2",
     "npm": "^10.8.3",
     "preact": "^10.23.2",
     "preline": "^2.5.1"
