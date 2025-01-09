@@ -12,7 +12,7 @@ export async function POST({ request }) {
         path: "/", // ✅ Available site-wide
         httpOnly: false, // ❌ Set `true` in production (prevents JS access)
         secure: false, // ❌ Set `true` in production (for HTTPS only)
-        sameSite: "Lax", // ✅ Prevents CSRF attacks
+        sameSite: "lax", // ✅ Prevents CSRF attacks
         maxAge: 60 * 60 * 24, // ✅ 1 day expiration
       });
 
