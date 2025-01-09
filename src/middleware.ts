@@ -10,7 +10,7 @@ const middleware: MiddlewareHandler = async ({ request, locals }, next) => {
   if (!isAuthenticated && url.pathname !== "/password") {
     return new Response(null, {
       status: 302,
-      headers: { Location: "/password" },
+      headers: { Location: "/pages" },
     });
   }
 
