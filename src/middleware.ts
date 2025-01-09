@@ -1,41 +1,26 @@
-import { serialize } from "cookie";
+import type { MiddlewareHandler } from "astro";
 
-export async function POST({ request }) {
-  try {
-    const formData = await request.formData();
-    const password = formData.get("password");
-    const correctPassword = import.meta.env.SITE_PASSWORD; // ✅ Load from `.env`
+export const onRequest: MiddlewareHandler = async (
+  { request, redirect },
+  next,
+) => {
+  const cookies = request.headers.get("cookie") || "";
+  const isAuthenticated = cookies.includes("site_auth=authenticated");
 
-    if (password === correctPassword) {
-      // ✅ Set authentication cookie
-      const authCookie = serialize("site_auth", "authenticated", {
-        path: "/", // ✅ Available site-wide
-        httpOnly: false, // ❌ Set `true` in production (prevents JS access)
-        secure: false, // ❌ Set `true` in production (for HTTPS only)
-        sameSite: "lax", // ✅ Prevents CSRF attacks
-        maxAge: 60 * 60 * 24, // ✅ 1 day expiration
-      });
+  // Detect if user is in a Vercel preview or development session
+  const isVercelSession =
+    process.env.VERCEL && process.env.VERCEL_ENV !== "production";
 
-      console.log("✅ Setting Cookie:", authCookie); // Debugging
-
-      return new Response(null, {
-        status: 302,
-        headers: {
-          "Set-Cookie": authCookie, // ✅ Store authentication cookie
-          Location: "/", // ✅ Redirect to homepage after login
-        },
-      });
-    }
-
-    return new Response(JSON.stringify({ error: "Invalid password" }), {
-      status: 401,
-      headers: { "Content-Type": "application/json" },
-    });
-  } catch (error) {
-    console.error("Error in login handler:", error);
-    return new Response(JSON.stringify({ error: "Server error" }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+  // ✅ Allow authenticated users or Vercel preview users
+  if (isAuthenticated || isVercelSession) {
+    return next(); // ✅ Continue request
   }
-}
+
+  // ✅ Prevent redirect loop if already on `/password`
+  if (request.url.endsWith("/password")) {
+    return next(); // ✅ Let the user access the password page
+  }
+
+  // 🚨 Otherwise, redirect to `/password`
+  return redirect("/password");
+};
