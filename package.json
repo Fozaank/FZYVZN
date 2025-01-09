@@ -20,6 +20,7 @@
     "@preline/overlay": "^2.5.0",
     "@studio-freight/lenis": "^1.0.42",
     "@types/clipboard": "^2.0.10",
+    "@vercel/edge": "^1.2.1",
     "astro": "^4.15.4",
     "astro-vtbot": "^1.10.7",
     "clipboard": "^2.0.11",
