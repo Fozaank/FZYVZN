@@ -1,7 +1,7 @@
 import { defineConfig } from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
 import sitemap from "@astrojs/sitemap";
-import middleware from "./src/middleware.ts";
+import vercel from "@astrojs/vercel"; // ✅ Import Vercel adapter
 export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
@@ -11,5 +11,5 @@ export default defineConfig({
   compressHTML: true,
   integrations: [sitemap()],
   output: "server",
+  adapter: vercel(),
 });
-
