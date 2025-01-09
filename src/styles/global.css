@@ -95,22 +95,6 @@
   height: 100%; /* Ensures content stays centered */
   text-align: center;
 }
-/* Parallax Styles */
-.video-bg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  z-index: -1; /* Keeps video behind content */
-}
-
-.parallax-text {
-  position: relative;
-  z-index: 10; /* Ensures text is above video */
-  color: white;
-}
 
 iframe {
   z-index: 5; /* Makes sure the iframe sits between video and content */
