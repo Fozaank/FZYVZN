@@ -1,21 +1,41 @@
-import type { MiddlewareHandler } from "astro";
-import { parse } from "cookie";
+import { serialize } from "cookie";
 
-const middleware: MiddlewareHandler = async ({ request, locals }, next) => {
-  const url = new URL(request.url);
-  const cookies = parse(request.headers.get("cookie") || "");
-  const isAuthenticated = cookies.site_auth === "authenticated";
+export async function POST({ request }) {
+  try {
+    const formData = await request.formData();
+    const password = formData.get("password");
+    const correctPassword = import.meta.env.SITE_PASSWORD; // ✅ Load from `.env`
 
-  // Allow access to the password page, but block all others
-  if (!isAuthenticated && url.pathname !== "/password") {
-    return new Response(null, {
-      status: 302,
-      headers: { Location: "/password" },
+    if (password === correctPassword) {
+      // ✅ Set authentication cookie
+      const authCookie = serialize("site_auth", "authenticated", {
+        path: "/", // ✅ Available site-wide
+        httpOnly: false, // ❌ Set `true` in production (prevents JS access)
+        secure: false, // ❌ Set `true` in production (for HTTPS only)
+        sameSite: "Lax", // ✅ Prevents CSRF attacks
+        maxAge: 60 * 60 * 24, // ✅ 1 day expiration
+      });
+
+      console.log("✅ Setting Cookie:", authCookie); // Debugging
+
+      return new Response(null, {
+        status: 302,
+        headers: {
+          "Set-Cookie": authCookie, // ✅ Store authentication cookie
+          Location: "/", // ✅ Redirect to homepage after login
+        },
+      });
+    }
+
+    return new Response(JSON.stringify({ error: "Invalid password" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    console.error("Error in login handler:", error);
+    return new Response(JSON.stringify({ error: "Server error" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
     });
   }
-
-  return next();
-};
-
-// ✅ Correctly export the middleware in Astro
-export const onRequest: MiddlewareHandler = middleware;
+}

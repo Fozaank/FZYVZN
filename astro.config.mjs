@@ -1,12 +1,15 @@
-import { defineConfig } from 'astro/config';
-import tailwindcss from '@tailwindcss/vite';
+import { defineConfig } from "astro/config";
+import tailwindcss from "@tailwindcss/vite";
 import sitemap from "@astrojs/sitemap";
+import middleware from "./src/middleware.ts";
 export default defineConfig({
-   vite: {
+  vite: {
     plugins: [tailwindcss()],
   },
   // add yur domain name here
-  site: 'https://fzyvzn.com',
+  site: "https://fzyvzn.com",
   compressHTML: true,
-  integrations: [sitemap()]
+  integrations: [sitemap()],
+  output: "server",
 });
+
