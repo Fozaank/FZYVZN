@@ -7,20 +7,19 @@ export const onRequest: MiddlewareHandler = async (
   const cookies = request.headers.get("cookie") || "";
   const isAuthenticated = cookies.includes("site_auth=authenticated");
 
-  // Detect if user is in a Vercel preview or development session
   const isVercelSession =
     process.env.VERCEL && process.env.VERCEL_ENV !== "production";
 
-  // ✅ Allow authenticated users or Vercel preview users
+  // ✅ Allow access if authenticated or in a Vercel preview session
   if (isAuthenticated || isVercelSession) {
-    return next(); // ✅ Continue request
+    return next();
   }
 
-  // ✅ Prevent redirect loop if already on `/password`
+  // ✅ Prevent redirect loop on `/password`
   if (request.url.endsWith("/password")) {
-    return next(); // ✅ Let the user access the password page
+    return next();
   }
 
-  // 🚨 Otherwise, redirect to `/password`
+  // 🚨 Redirect to `/password` if not authenticated
   return redirect("/password");
 };
