@@ -1,25 +1,27 @@
 import type { MiddlewareHandler } from "astro";
 
 export const onRequest: MiddlewareHandler = async (
-  { request, redirect },
+  { request, locals, redirect },
   next,
 ) => {
   const cookies = request.headers.get("cookie") || "";
   const isAuthenticated = cookies.includes("site_auth=authenticated");
 
-  const isVercelSession =
-    process.env.VERCEL && process.env.VERCEL_ENV !== "production";
+  // ✅ Automatically bypass password if logged into Vercel (for admins)
+  const adminBypassEmail = process.env.VERCEL_ADMIN_BYPASS;
+  const vercelSession =
+    request.headers.get("x-vercel-deployment-url") && adminBypassEmail;
 
-  // ✅ Allow access if authenticated or in a Vercel preview session
-  if (isAuthenticated || isVercelSession) {
+  // ✅ Allow access if authenticated or admin session detected
+  if (isAuthenticated || vercelSession) {
     return next();
   }
 
-  // ✅ Prevent redirect loop on `/password`
+  // ✅ Let users access the password page
   if (request.url.endsWith("/password")) {
     return next();
   }
 
-  // 🚨 Redirect to `/password` if not authenticated
+  // 🔴 Redirect to `/password` if not authenticated
   return redirect("/password");
 };
