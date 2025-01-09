@@ -1,19 +1,21 @@
-// src/middleware.ts
+import type { MiddlewareHandler } from "astro";
 import { parse } from "cookie";
-import { IncomingMessage, ServerResponse } from "http";
 
-export default async function handler(
-  req: IncomingMessage,
-  res: ServerResponse,
-) {
-  const cookies = parse(req.headers.cookie || "");
+const middleware: MiddlewareHandler = async ({ request, locals }, next) => {
+  const url = new URL(request.url);
+  const cookies = parse(request.headers.get("cookie") || "");
   const isAuthenticated = cookies.site_auth === "authenticated";
 
-  if (!isAuthenticated && req.url !== "/password") {
-    res.writeHead(302, { Location: "/password" });
-    res.end();
-    return;
+  // Allow access to the password page, but block all others
+  if (!isAuthenticated && url.pathname !== "/password") {
+    return new Response(null, {
+      status: 302,
+      headers: { Location: "/password" },
+    });
   }
 
-  // Continue with the request
-}
+  return next();
+};
+
+// ✅ Correctly export the middleware in Astro
+export const onRequest: MiddlewareHandler = middleware;
